@@ -1,0 +1,32 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>JS Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body id="body">
+        <div title="a">
+            <script src="http://codeorigin.jquery.com/jquery-2.0.3.js"></script>
+            <!-- TOBE remotes START -->
+            <script src="js/libs/namespace.js"></script>
+            <script src="js/libs/cids.js"></script>
+            <script src="js/libs/pure_rest_backend.js"></script>
+            <script src="js/libs/tools.js"></script>
+            <!-- TOBE remotes END -->
+            <script src="js/scenario-evolution-widget-core.js"></script>
+            <script type="text/javascript">
+                var sew = de.cismet.crisma.scenario_evolution_widget;
+                var widget = sew.createWidget(document.getElementById('body'), 'crisma');
+                widget.setBackend(ci);
+                
+                console.log(widget.getDefaultDomain());
+                
+                widget.setWorldstate(50);
+            </script>
+        </div>
+    </body>
+</html>
