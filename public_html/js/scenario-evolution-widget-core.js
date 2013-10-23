@@ -2,16 +2,29 @@
 
 (function(se, undefined) {
     se.createWidget = function(dom, defaultDomain) {
-        var tools = de.cismet.tools;
+        var nonce = 'obj' + Math.floor((Math.random() * 100000000) + 1);
+        var Tools = de.cismet.Tools;
         var DOM = dom;
         var defDomain = defaultDomain;
+        var listeners = [];
 
         var domain;
         var backend;
         var ws;
-
+        
+        var createButton = function(worldstate){
+            var button = document.createElement("input");
+            
+            button.setAttribute("type", "button");
+            button.setAttribute("name", "wsButton" + worldstate.id);
+            button.setAttribute("value", worldstate.name);
+            button.setAttribute("onclick", "de.cismet.crisma.Scenario_evolution_widget."+nonce+".setWorldstate(" + worldstate.id + ")");
+            
+            return button;
+        };
+        
         var createDOM = function() {
-            if(!ws){
+            if (!ws) {
                 throw {
                     name: 'IllegalStateException',
                     message: 'worldstate not set'
@@ -19,21 +32,25 @@
             }
             
             var root = document.createElement("div");
+            root.setAttribute("id", nonce);
             
             var wsPath = [ws];
             var cur = ws.parentworldstate;
-            var pString = ws.name;
-            while(cur !== undefined){
+            while (cur !== undefined && cur !== null) {
                 wsPath.push(cur);
-                pString = cur.name + ' -> ' + pString;
-                cur = cur.parentWorldstate;
+                cur = cur.parentworldstate;
             }
             
-            root.appendChild(document.createTextNode('WS Path: ' + pString))
+            while(wsPath.length > 0){
+                root.appendChild(createButton(wsPath.pop()));
+                if(wsPath.length > 0){
+                    root.appendChild(document.createTextNode("->"));
+                }
+            }
 
             return root;
         };
-
+        
         var getDefaultDomain = function() {
             return defDomain;
         };
@@ -47,7 +64,7 @@
         };
 
         var setBackend = function(b) {
-            if (tools.canExecute(b, 'getObject')) {
+            if (Tools.canExecute(b, 'getObject')) {
                 backend = b;
             } else {
                 throw {
@@ -86,20 +103,80 @@
                 }
             }
 
-            backend.getObject(dom, 'worldstates', id).done(function(worldstate){
+            backend.getObject(dom, 'worldstates', id).done(function(worldstate) {
+                var oldId = undefined;
+                if(ws){
+                    oldId = ws.id;
+                }
                 ws = worldstate;
-                DOM.appendChild(createDOM());
+                if(document.getElementById(nonce)){
+                    var nuu = createDOM();
+                    var old = document.getElementById(nonce);
+                    old.parentNode.replaceChild(nuu, old);                    
+                } else {
+                    DOM.appendChild(createDOM());
+                }
+                
+                if(oldId && oldId !== id){
+                    fireWorldstateChanged(id);
+                }
             });
         };
-
-        return {
+        
+        var addWorldstateChangedListener = function(callback){
+            if(typeof callback === 'function'){
+                for(var i = 0; i < listeners.length; ++i){
+                    if(!listeners[i]){
+                        listeners[i] = callback;
+                        
+                        // everything done, bail out
+                        return;
+                    }
+                }
+                
+                // no free spaces in the array, add to end
+                listeners.push(callback);
+            }
+        };
+        
+        var removeWorldstateChangedListener = function(callback){
+            for(var i = 0; i < listeners.length; ++i){
+                if(listeners[i] === callback){
+                    listeners[i] = undefined;
+                }
+            }
+        };
+        
+        var fireWorldstateChanged = function(wsId) {
+            for(var i = 0; i < listeners.length; ++i){
+                if(listeners[i]){
+                    listeners[i](wsId);
+                }
+            }
+        };
+        
+        var self = {
             getDomain: getDomain,
             setDomain: setDomain,
             getBackend: getBackend,
             setBackend: setBackend,
             getWorldstate: getWorldstate,
             setWorldstate: setWorldstate,
-            getDefaultDomain: getDefaultDomain
+            getDefaultDomain: getDefaultDomain,
+            addWorldstateChangedListener: addWorldstateChangedListener,
+            removeWorldstateChangedListener: removeWorldstateChangedListener,
+            dispose: dispose
         };
+        
+        var dispose = function(){
+            var selfDom = document.getElementById(nonce);
+            selfDom.parentNode.removeChild(selfDom);
+            listeners = undefined;
+            se[nonce] = undefined;
+        };
+        
+        se[nonce] = self;
+        
+        return self;
     };
-})(de.cismet.namespace.create("de.cismet.crisma.scenario_evolution_widget"));
+})(de.cismet.Namespace.create("de.cismet.crisma.Scenario_evolution_widget"));

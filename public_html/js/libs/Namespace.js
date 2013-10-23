@@ -2,12 +2,12 @@
 
 (function(de, undefined) {
     (function(cismet, undefined) {
-        (function(namespace, undefined) {
+        (function(Namespace, undefined) {
             var canExecute = function(obj, method) {
                 return obj[method] && typeof obj[method] === 'function';
             };
 
-            namespace.create = function(ns) {
+            Namespace.create = function(ns) {
                 // NOTE: how can these errors be caught if used in anonymous self-executing functions?
                 if (!ns.length || !ns.length > 0) {
                     throw {
@@ -37,6 +37,6 @@
                 }
 
             };
-        })(window.de.cismet.namespace = window.de.cismet.namespace || {});
+        })(window.de.cismet.Namespace = window.de.cismet.Namespace || {});
     })(window.de.cismet = window.de.cismet || {});
 })(window.de = window.de || {});

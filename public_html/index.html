@@ -12,20 +12,30 @@ and open the template in the editor.
         <div title="a">
             <script src="http://codeorigin.jquery.com/jquery-2.0.3.js"></script>
             <!-- TOBE remotes START -->
-            <script src="js/libs/namespace.js"></script>
+            <script src="js/libs/Namespace.js"></script>
             <script src="js/libs/cids.js"></script>
             <script src="js/libs/pure_rest_backend.js"></script>
-            <script src="js/libs/tools.js"></script>
+            <script src="js/libs/Tools.js"></script>
             <!-- TOBE remotes END -->
             <script src="js/scenario-evolution-widget-core.js"></script>
             <script type="text/javascript">
-                var sew = de.cismet.crisma.scenario_evolution_widget;
+                var sew = de.cismet.crisma.Scenario_evolution_widget;
                 var widget = sew.createWidget(document.getElementById('body'), 'crisma');
                 widget.setBackend(ci);
                 
                 console.log(widget.getDefaultDomain());
                 
-                widget.setWorldstate(50);
+                
+                var l1 = function(wsId){
+                    alert('l1: ' + wsId)
+                };
+                widget.addWorldstateChangedListener(l1);
+                var l2 = function(wsId){
+                    alert('l2: ' + wsId);
+                };
+                widget.addWorldstateChangedListener(l2);
+                
+                widget.setWorldstate(58);
             </script>
         </div>
     </body>
