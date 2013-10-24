@@ -14,7 +14,7 @@
         
         var createButton = function(worldstate){
             var button = document.createElement("input");
-            
+          
             button.setAttribute("type", "button");
             button.setAttribute("name", "wsButton" + worldstate.id);
             button.setAttribute("value", worldstate.name);
@@ -87,6 +87,11 @@
         };
 
         var setWorldstate = function(id) {
+            if(ws && ws.id === id){
+                // ignore as worldstate is already set
+                return;
+            }
+            
             if (!backend) {
                 throw {
                     name: 'IllegalStateException',
